@@ -18,6 +18,8 @@ public class PlayerController : MonoBehaviour
         void Update ()
         {
                 m_moveDirection = new Vector3( Input.GetAxisRaw( "Horizontal" ) , 0 , Input.GetAxis( "Vertical" ) ).normalized;
+                if ( Input.GetKeyDown( KeyCode.Space ) )
+                        m_rigidBody.AddForce( Vector3.up * 600 );
         }
 
 

@@ -18,7 +18,7 @@ public class PlanetGravity : MonoBehaviour
         {
                 //The gravity direction of the planet
                 Vector3 gravityUp = ( body.position - m_transform.position ).normalized;
-                Vector3 bodyUp = body.up;
+                Vector3 bodyUp = body.up ;
 
                 //Add the gravity to the target object
                 body.GetComponent<Rigidbody>().AddForce( gravity * gravityUp );
