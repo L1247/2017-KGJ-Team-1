@@ -1,6 +1,5 @@
 ﻿using UnityEngine;
 
-[RequireComponent( typeof( GravityBody ) )]
 public class MotoPlayer : MonoBehaviour
 {
 
@@ -16,22 +15,15 @@ public class MotoPlayer : MonoBehaviour
         Vector3 smoothMoveVelocity;
         float verticalLookRotation;
         Transform cameraTransform;
-        Rigidbody rigidbody;
-
-
+        new Rigidbody rigidbody;
+        
         void Awake ()
         {
-                Cursor.lockState = CursorLockMode.Locked;
-                Cursor.visible = false;
-                cameraTransform = Camera.main.transform;
                 rigidbody = GetComponent<Rigidbody>();
         }
 
         void Update ()
         {
-                
-                // Look rotation:
-                verticalLookRotation = Mathf.Clamp( verticalLookRotation , -60 , 60 );
 
                 // Calculate movement:
                 float inputX = Input.GetAxisRaw( "Horizontal" );
@@ -55,6 +47,10 @@ public class MotoPlayer : MonoBehaviour
                 {
                         grounded = false;
                 }
+                //string str = "";
+                //if ( IsNotCollision )
+                //        str = "Collision : ";
+                //print( str+ rigidbody.velocity.magnitude );
 
         }
 
@@ -69,10 +65,14 @@ public class MotoPlayer : MonoBehaviour
                 rigidbody.MovePosition( rigidbody.position + localMove );
         }
 
+        /// <summary>
+        /// 阿罵 脫離Joint控制。
+        /// </summary>
         public void SetJointNull ()
         {
                 IsNotCollision = true;
                 GetComponent<FixedJoint>().connectedBody = null;
-                GameObjectFinder.GetObj( "AMa" ).GetComponent<Rigidbody>().useGravity = false;
+                GameObjectFinder.GetObj( "NPC_GrandMother" ).GetComponent<Rigidbody>().useGravity = false;
+                GameObjectFinder.GetObj( "Audio" ).GetComponent<AudioSource>().Play();
         }
 }

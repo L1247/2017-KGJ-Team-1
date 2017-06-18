@@ -1,6 +1,8 @@
 ﻿using UnityEngine;
-using System.Collections;
 
+/// <summary>
+/// 地表重力系統
+/// </summary>
 public class GravityAttractor : MonoBehaviour {
 	
 	public float gravity = -9.8f;

@@ -6,5 +6,5 @@ EditorBuildSettings:
   serializedVersion: 2
   m_Scenes:
   - enabled: 1
-    path: Assets/Scenes/Main Scene.unity
-    guid: d06b1eafa1994fe4e865e4c1fe16ee8a
+    path: Assets/Scenes/MainScene_UseAutoMove.unity
+    guid: b0597f1710775a345975bbf9fef198a1
