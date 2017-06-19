@@ -1,29 +1,29 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
+﻿using UnityEngine;
 
-public class FaceCam : MonoBehaviour {
+public class FaceCam : MonoBehaviour
+{
 
-    private Camera _mainCam = null;
-    private Transform _mFace = null;
+        private Camera _mainCam = null;
+        private Transform _mFace = null;
 
 
-    private void Awake()
-    {
-        _mainCam = Camera.main;
-        _mFace = transform;
-    }
+        private void Awake ()
+        {
+                _mainCam = Camera.main;
+                _mFace = transform;
+        }
 
-    void FixedUpdate()
-    {
-        if (!_mFace) return;
+        void FixedUpdate ()
+        {
+                if ( !_mFace )
+                        return;
+                if ( _mainCam != null )
+                        UpdateFacingCamera();
+        }
 
-        UpdateFacingCamera();
-    }
-
-    private void UpdateFacingCamera()
-    {
-        _mFace.LookAt(_mainCam.transform);
-    }
+        private void UpdateFacingCamera ()
+        {
+                _mFace.LookAt( _mainCam.transform );
+        }
 
 }

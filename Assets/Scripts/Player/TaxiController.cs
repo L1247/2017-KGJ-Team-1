@@ -36,7 +36,10 @@ public class TaxiController : MonoBehaviour
                 rigidbody = GetComponent<Rigidbody>();
                 animator = GetComponent<Animator>();
                 CanGen = true;
+                ccMessage.f_AddListener( GameMessage.SpawnNPC , SpawnMoto );
         }
+
+
 
         void Update ()
         {
@@ -98,7 +101,6 @@ public class TaxiController : MonoBehaviour
                 {
                         CanGen = false;
                         animator.SetTrigger( "Rotate" );
-                        Invoke( "GenMoto" , 1f );
                 }
 
         }
@@ -115,11 +117,19 @@ public class TaxiController : MonoBehaviour
         {
                 if ( collision.collider.name.Equals( MotoName ) )
                 {
+                        AMaGameManager.Instance.SetGameOver();
+                        Invoke( "ChangeCamera" , 2f );
                         collision.collider.GetComponent<MotoPlayer>().SetJointNull();
                         Instantiate( GameObjectFinder.GetObj( "FX_Hit_01" ) ,
-                         collision.transform.position - Vector3.forward  , Quaternion.identity );
+                         collision.transform.position - Vector3.forward , Quaternion.identity );
                 }
         }
+
+        private void SpawnMoto ( object data )
+        {
+                Invoke( "GenMoto" , 1f );
+        }
+
         GameObject MotoCycleInstance;
         void GenMoto ()
         {
@@ -127,8 +137,6 @@ public class TaxiController : MonoBehaviour
                 Vector3 MotoGenPos = Vector3.right * 4.22f + Vector3.forward * transform.position.z;
                 MotoCycleInstance = Instantiate( MotoCyclePrefab ,
                  MotoGenPos , Quaternion.identity );
-
-                 Invoke( "ChangeCamera" , 2f );
 
         }
 
@@ -143,7 +151,7 @@ public class TaxiController : MonoBehaviour
                 foreach ( var item in FindObjectsOfType<Camera>() )
                 {
                         item.gameObject.SetActive( false );
-                } 
+                }
                 GameObjectFinder.GetObj( "CutScene" ).SetActive( true );
         }
 
