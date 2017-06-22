@@ -150,7 +150,7 @@ Transform:
   m_GameObject: {fileID: 1674827109528580}
   m_LocalRotation: {x: 0.71642226, y: -0.025361931, z: -0.02530202, w: 0.6967465}
   m_LocalPosition: {x: 0.007852325, y: 0.0013061905, z: 1.0501074}
-  m_LocalScale: {x: 0.9471044, y: 0.9847734, z: 1.0769429}
+  m_LocalScale: {x: 4.444713, y: 4.621493, z: 5.05404}
   m_Children: []
   m_Father: {fileID: 4353741677784742}
   m_RootOrder: 0
@@ -462,6 +462,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   DestroyTime: 5
+  HintAudio: {fileID: 0}
 --- !u!114 &114995716797631656
 MonoBehaviour:
   m_ObjectHideFlags: 1

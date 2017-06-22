@@ -11,23 +11,31 @@ public class TaxiController : MonoBehaviour
         public float mouseSensitivityY = 1;
         public float walkSpeed = 6;
         public float jumpForce = 220;
-        public LayerMask groundedMask;
         public float RayLength = 1 + .1f;
+        [Header("倒數經過多久，計程車沒有撞到東西，就重製")]
+        public float ResetTime;
+        public LayerMask groundedMask;
         public string MotoName;
         public AudioClip Bububu;
         public bool CanPlayerControl;
 
         // System vars
         bool grounded;
-        bool CanGen ;
+        // 計程車可往右靠
+        bool CanRightMove ;
+        //可執行碰撞後面的事情
+        bool CanPerformCollision;
+
         Vector3 moveAmount;
         Vector3 smoothMoveVelocity;
+        Vector3 InitPostion;
         float verticalLookRotation;
-        Transform cameraTransform;
         new Rigidbody rigidbody;
+        Transform cameraTransform;
         Animator animator;
 
 
+        #region Mono Events
         void Awake ()
         {
                 //Cursor.lockState = CursorLockMode.Locked;
@@ -35,11 +43,10 @@ public class TaxiController : MonoBehaviour
                 cameraTransform = Camera.main.transform;
                 rigidbody = GetComponent<Rigidbody>();
                 animator = GetComponent<Animator>();
-                CanGen = true;
-                ccMessage.f_AddListener( GameMessage.SpawnNPC , SpawnMoto );
+                CanRightMove = true;
+                CanPerformCollision = true;
+                InitPostion = transform.position;
         }
-
-
 
         void Update ()
         {
@@ -49,8 +56,6 @@ public class TaxiController : MonoBehaviour
                 //verticalLookRotation += Input.GetAxis( "Mouse Y" ) * mouseSensitivityY;
                 //verticalLookRotation = Mathf.Clamp( verticalLookRotation , -60 , 60 );
                 //cameraTransform.localEulerAngles = Vector3.left * verticalLookRotation;
-
-
 
                 #region Self Control
                 if ( CanPlayerControl )
@@ -96,15 +101,16 @@ public class TaxiController : MonoBehaviour
                         moveAmount = Vector3.SmoothDamp( moveAmount , targetMoveAmount , ref smoothMoveVelocity , .15f );
                 }
                 #endregion
-                //Spawn Moto 
-                if ( Input.GetMouseButtonDown( 0 ) && CanGen )
+
+                //計程車靠右
+                if ( Input.GetMouseButtonDown( 0 ) && CanRightMove )
                 {
-                        CanGen = false;
-                        animator.SetTrigger( "Rotate" );
+                        CanRightMove = false;
+                        animator.SetBool( "Rotate" , true );
+                        Invoke( "ResetGame" , ResetTime );
                 }
 
         }
-
 
         void FixedUpdate ()
         {
@@ -113,46 +119,37 @@ public class TaxiController : MonoBehaviour
                 rigidbody.MovePosition( rigidbody.position + localMove );
         }
 
+        /// <summary>
+        /// 計程車碰撞到摩托車，產生特效，解開Joint
+        /// </summary>
+        /// <param name="collision"></param>
         public void OnCollisionEnter ( Collision collision )
         {
-                if ( collision.collider.name.Equals( MotoName ) )
+                if ( CanPerformCollision )
                 {
-                        AMaGameManager.Instance.SetGameOver();
-                        Invoke( "ChangeCamera" , 2f );
-                        collision.collider.GetComponent<MotoPlayer>().SetJointNull();
-                        Instantiate( GameObjectFinder.GetObj( "FX_Hit_01" ) ,
-                         collision.transform.position - Vector3.forward , Quaternion.identity );
+                        if ( collision.collider.name.Equals( MotoName ) )
+                        {
+                                CanPerformCollision = false;
+                                ccMessage.f_Broadcast( GameMessage.TaxiCollision );
+                                collision.collider.GetComponent<MotoPlayer>().SetJointNull();
+                                Instantiate( GameObjectFinder.GetObj( "FX_Hit_01" ) ,
+                                 collision.transform.position - Vector3.forward * 4 + Vector3.up * 4 , Quaternion.identity );
+                                CancelInvoke( "ResetGame" );
+                        }
                 }
         }
+        #endregion
 
-        private void SpawnMoto ( object data )
+        /// <summary>
+        /// 時間到，計程車沒有撞到東西，重置遊戲。
+        /// 初始化位置，設為可右靠
+        /// </summary>
+        private void ResetGame ()
         {
-                Invoke( "GenMoto" , 1f );
+                animator.SetBool( "Rotate" , false );
+                transform.position = InitPostion;
+                CanRightMove = true;
+                CanPerformCollision = true;
+                ccMessage.f_Broadcast( GameMessage.ResetGame );
         }
-
-        GameObject MotoCycleInstance;
-        void GenMoto ()
-        {
-                GameObject MotoCyclePrefab = GameObjectFinder.GetObj( "MotorCycle" );
-                Vector3 MotoGenPos = Vector3.right * 4.22f + Vector3.forward * transform.position.z;
-                MotoCycleInstance = Instantiate( MotoCyclePrefab ,
-                 MotoGenPos , Quaternion.identity );
-
-        }
-
-        void ChangeCamera ()
-        {
-                MotoCycleInstance.transform.Find( "NPC_GrandMother/Camera" ).gameObject.SetActive( true );
-                Invoke( "ShowCutScene" , 1f );
-        }
-
-        void ShowCutScene ()
-        {
-                foreach ( var item in FindObjectsOfType<Camera>() )
-                {
-                        item.gameObject.SetActive( false );
-                }
-                GameObjectFinder.GetObj( "CutScene" ).SetActive( true );
-        }
-
 }
